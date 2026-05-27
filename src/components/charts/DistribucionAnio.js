@@ -42,7 +42,7 @@ export default function DistribucionAnio({ data }) {
         Distribución de alumnos que completaron el test
       </p>
 
-      <div className="w-full h-64">
+      <div className="w-full h-64 mb-4">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} barCategoryGap="20%">
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -64,6 +64,16 @@ export default function DistribucionAnio({ data }) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Data Breakdown for PDF/Print */}
+      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-white/10">
+        {chartData.map((d, i) => (
+          <div key={i} className="text-sm">
+            <span className="text-white/60">{d.name}:</span>{" "}
+            <span className="text-white font-bold">{d.cantidad} alumnos</span>
+          </div>
+        ))}
       </div>
     </div>
   );

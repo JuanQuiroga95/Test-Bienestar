@@ -6,6 +6,8 @@ import DistribucionAnio from "./charts/DistribucionAnio";
 import PromedioAnio from "./charts/PromedioAnio";
 import EstadoBienestar from "./charts/EstadoBienestar";
 import QRCode from "react-qr-code";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function AdminDashboard({ onLogout }) {
   const [data, setData] = useState([]);
@@ -15,6 +17,7 @@ export default function AdminDashboard({ onLogout }) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const testUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   useEffect(() => {
@@ -46,6 +49,32 @@ export default function AdminDashboard({ onLogout }) {
       setError(err.message);
     } finally {
       setResetting(false);
+    }
+  };
+
+  const exportToPDF = async () => {
+    try {
+      setIsExporting(true);
+      const element = document.getElementById("pdf-export-content");
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        backgroundColor: "#0f0d1a",
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("Reporte_Bienestar_Digital.pdf");
+    } catch (err) {
+      console.error("Error al exportar PDF:", err);
+      alert("Hubo un error al generar el PDF.");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -122,6 +151,24 @@ export default function AdminDashboard({ onLogout }) {
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={exportToPDF}
+              disabled={isExporting || totalRespuestas === 0}
+              id="btn-export-pdf"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all disabled:opacity-50"
+              title="Descargar PDF"
+            >
+              {isExporting ? (
+                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              )}
+            </button>
+            <button
               onClick={() => setShowQR(true)}
               id="btn-show-qr"
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all"
@@ -184,38 +231,41 @@ export default function AdminDashboard({ onLogout }) {
           </div>
         </div>
 
-        {/* Summary cards */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
-            <p className="text-xs text-indigo-300/60 font-semibold uppercase tracking-wider">
-              Total respuestas
-            </p>
-            <p className="text-3xl font-extrabold text-white mt-1">
-              {totalRespuestas}
-            </p>
+        {/* Content to export */}
+        <div id="pdf-export-content" className="p-4 -mx-4 rounded-xl">
+          {/* Summary cards */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+              <p className="text-xs text-indigo-300/60 font-semibold uppercase tracking-wider">
+                Total respuestas
+              </p>
+              <p className="text-3xl font-extrabold text-white mt-1">
+                {totalRespuestas}
+              </p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+              <p className="text-xs text-indigo-300/60 font-semibold uppercase tracking-wider">
+                Promedio general
+              </p>
+              <p className={`text-3xl font-extrabold mt-1 ${getEstadoColor(promedioGeneral)}`}>
+                {promedioGeneral}
+                <span className="text-lg text-white/30"> / 30</span>
+              </p>
+            </div>
           </div>
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
-            <p className="text-xs text-indigo-300/60 font-semibold uppercase tracking-wider">
-              Promedio general
-            </p>
-            <p className={`text-3xl font-extrabold mt-1 ${getEstadoColor(promedioGeneral)}`}>
-              {promedioGeneral}
-              <span className="text-lg text-white/30"> / 30</span>
-            </p>
-          </div>
-        </div>
 
-        {error && (
-          <div className="mb-6 bg-rose-500/10 border border-rose-400/30 rounded-2xl p-4">
-            <p className="text-rose-400 text-sm">⚠️ {error}</p>
-          </div>
-        )}
+          {error && (
+            <div className="mb-6 bg-rose-500/10 border border-rose-400/30 rounded-2xl p-4">
+              <p className="text-rose-400 text-sm">⚠️ {error}</p>
+            </div>
+          )}
 
-        {/* Charts */}
-        <div className="space-y-6">
-          <EstadoBienestar data={filteredData} />
-          <DistribucionAnio data={filteredData} />
-          <PromedioAnio data={filteredData} />
+          {/* Charts */}
+          <div className="space-y-6">
+            <EstadoBienestar data={filteredData} />
+            <DistribucionAnio data={filteredData} />
+            <PromedioAnio data={filteredData} />
+          </div>
         </div>
 
         {/* Reset button */}

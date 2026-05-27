@@ -101,7 +101,7 @@ export default function PromedioAnio({ data }) {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-4 mt-3 justify-center">
+      <div className="flex flex-wrap gap-4 mt-3 justify-center mb-4">
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
           <span className="text-xs text-white/50">≤16 Saludable</span>
@@ -114,6 +114,20 @@ export default function PromedioAnio({ data }) {
           <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
           <span className="text-xs text-white/50">≥24 Afecta</span>
         </div>
+      </div>
+
+      {/* Data Breakdown for PDF/Print */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-white/10">
+        {chartData.map((d, i) => {
+          const estado = d.promedio === 0 ? "-" : d.promedio <= 16 ? "Saludable" : d.promedio <= 23 ? "A revisar" : "Afecta";
+          return (
+            <div key={i} className="text-sm">
+              <span className="text-white/60">{d.name}:</span>{" "}
+              <span className="text-white font-bold">{d.promedio} pts</span>
+              {d.promedio > 0 && <span className="block text-xs text-white/40">{estado}</span>}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
