@@ -11,6 +11,8 @@ export default function AdminDashboard({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [filterAnio, setFilterAnio] = useState("todos");
   const [error, setError] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -27,6 +29,20 @@ export default function AdminDashboard({ onLogout }) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleReset = async () => {
+    try {
+      setResetting(true);
+      const res = await fetch("/api/respuestas", { method: "DELETE" });
+      if (!res.ok) throw new Error("Error al borrar datos");
+      setData([]);
+      setShowResetConfirm(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -187,6 +203,42 @@ export default function AdminDashboard({ onLogout }) {
           <EstadoBienestar data={filteredData} />
           <DistribucionAnio data={filteredData} />
           <PromedioAnio data={filteredData} />
+        </div>
+
+        {/* Reset button */}
+        <div className="mt-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-white">Reiniciar datos</p>
+              <p className="text-xs text-indigo-300/50 mt-0.5">Eliminar todas las respuestas del test</p>
+            </div>
+            {!showResetConfirm ? (
+              <button
+                onClick={() => setShowResetConfirm(true)}
+                id="btn-reset-data"
+                className="px-4 py-2 rounded-xl bg-rose-500/10 border border-rose-400/30 text-rose-400 text-sm font-medium hover:bg-rose-500/20 transition-all"
+              >
+                🗑️ Reiniciar
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 animate-fadeIn">
+                <button
+                  onClick={() => setShowResetConfirm(false)}
+                  className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-medium hover:bg-white/10 transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleReset}
+                  disabled={resetting}
+                  id="btn-confirm-reset"
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold transition-all disabled:opacity-50"
+                >
+                  {resetting ? "Borrando..." : "⚠️ Confirmar"}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}

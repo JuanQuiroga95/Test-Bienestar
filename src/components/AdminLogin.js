@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "videla2024";
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Videla4012";
 
 export default function AdminLogin({ onLogin }) {
   const [password, setPassword] = useState("");

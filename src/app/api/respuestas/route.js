@@ -92,3 +92,22 @@ export async function POST(request) {
     );
   }
 }
+
+// DELETE /api/respuestas - Borrar todas las respuestas
+export async function DELETE() {
+  try {
+    await ensureTable();
+    await sql`DELETE FROM respuestas`;
+
+    return NextResponse.json({
+      success: true,
+      message: "Todos los datos fueron eliminados correctamente",
+    });
+  } catch (error) {
+    console.error("Error al borrar respuestas:", error);
+    return NextResponse.json(
+      { error: "Error al borrar las respuestas" },
+      { status: 500 }
+    );
+  }
+}
