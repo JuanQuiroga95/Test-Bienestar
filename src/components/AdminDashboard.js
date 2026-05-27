@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import DistribucionAnio from "./charts/DistribucionAnio";
+import PromedioAnio from "./charts/PromedioAnio";
 import EstadoBienestar from "./charts/EstadoBienestar";
 import QRCode from "react-qr-code";
 
