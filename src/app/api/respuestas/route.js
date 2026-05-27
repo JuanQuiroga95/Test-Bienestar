@@ -1,62 +1,51 @@
 import { NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
 
-// ============================================================
-// ALMACENAMIENTO EN MEMORIA (para desarrollo rápido)
-// TODO: Reemplazar con conexión a base de datos real
-// Opciones recomendadas: MongoDB, PostgreSQL, Supabase, Firebase
-// ============================================================
+// Nombre de la base de datos y colección
+const DB_NAME = "test-bienestar";
+const COLLECTION_NAME = "respuestas";
 
-// Seed data para demostración
-let respuestas = [
-  { anio: "1", respuestas: [1, 2, 1, 2, 1, 1, 2, 1, 1, 2], puntajeTotal: 14, timestamp: "2026-05-20T10:00:00Z" },
-  { anio: "1", respuestas: [2, 2, 2, 2, 2, 2, 2, 2, 1, 2], puntajeTotal: 19, timestamp: "2026-05-20T10:05:00Z" },
-  { anio: "1", respuestas: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], puntajeTotal: 10, timestamp: "2026-05-20T10:10:00Z" },
-  { anio: "2", respuestas: [2, 3, 2, 3, 2, 2, 2, 2, 2, 2], puntajeTotal: 22, timestamp: "2026-05-20T11:00:00Z" },
-  { anio: "2", respuestas: [3, 3, 3, 2, 2, 3, 2, 2, 3, 3], puntajeTotal: 26, timestamp: "2026-05-20T11:05:00Z" },
-  { anio: "2", respuestas: [1, 2, 2, 1, 1, 2, 1, 2, 1, 2], puntajeTotal: 15, timestamp: "2026-05-20T11:10:00Z" },
-  { anio: "3", respuestas: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], puntajeTotal: 20, timestamp: "2026-05-21T09:00:00Z" },
-  { anio: "3", respuestas: [1, 1, 2, 1, 1, 1, 1, 1, 1, 1], puntajeTotal: 11, timestamp: "2026-05-21T09:05:00Z" },
-  { anio: "3", respuestas: [3, 3, 3, 3, 2, 3, 3, 2, 3, 3], puntajeTotal: 28, timestamp: "2026-05-21T09:10:00Z" },
-  { anio: "3", respuestas: [2, 2, 1, 2, 2, 2, 2, 2, 2, 1], puntajeTotal: 18, timestamp: "2026-05-21T09:15:00Z" },
-  { anio: "4", respuestas: [2, 3, 2, 3, 1, 2, 3, 2, 2, 3], puntajeTotal: 23, timestamp: "2026-05-22T14:00:00Z" },
-  { anio: "4", respuestas: [1, 1, 1, 2, 1, 1, 2, 1, 1, 1], puntajeTotal: 12, timestamp: "2026-05-22T14:05:00Z" },
-  { anio: "4", respuestas: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], puntajeTotal: 30, timestamp: "2026-05-22T14:10:00Z" },
-  { anio: "5", respuestas: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], puntajeTotal: 20, timestamp: "2026-05-23T08:00:00Z" },
-  { anio: "5", respuestas: [1, 2, 1, 1, 1, 2, 1, 2, 2, 1], puntajeTotal: 14, timestamp: "2026-05-23T08:05:00Z" },
-  { anio: "5", respuestas: [2, 3, 3, 2, 2, 2, 3, 2, 3, 2], puntajeTotal: 24, timestamp: "2026-05-23T08:10:00Z" },
-  { anio: "5", respuestas: [1, 1, 2, 2, 1, 1, 1, 2, 1, 2], puntajeTotal: 14, timestamp: "2026-05-23T08:15:00Z" },
-  { anio: "5", respuestas: [3, 2, 3, 3, 3, 2, 2, 3, 3, 2], puntajeTotal: 26, timestamp: "2026-05-23T08:20:00Z" },
-];
+async function getCollection() {
+  const client = await clientPromise;
+  const db = client.db(DB_NAME);
+  return db.collection(COLLECTION_NAME);
+}
 
 // GET /api/respuestas - Obtener todas las respuestas
 export async function GET(request) {
-  // TODO: Reemplazar con query a la base de datos
-  // Ejemplo con MongoDB:
-  //   const data = await collection.find({}).toArray();
-  //   return NextResponse.json({ data });
+  try {
+    const collection = await getCollection();
+    const { searchParams } = new URL(request.url);
+    const anio = searchParams.get("anio");
 
-  const { searchParams } = new URL(request.url);
-  const anio = searchParams.get("anio");
+    let filter = {};
+    if (anio && anio !== "todos") {
+      filter = { anio };
+    }
 
-  let data = respuestas;
-  if (anio && anio !== "todos") {
-    data = respuestas.filter((r) => r.anio === anio);
+    const data = await collection.find(filter).sort({ timestamp: -1 }).toArray();
+
+    return NextResponse.json({
+      data,
+      total: data.length,
+    });
+  } catch (error) {
+    console.error("Error al obtener respuestas:", error);
+    return NextResponse.json(
+      { error: "Error al obtener las respuestas" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({
-    data,
-    total: data.length,
-  });
 }
 
 // POST /api/respuestas - Guardar una nueva respuesta
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { anio, respuestas: answers, puntajeTotal } = body;
+    const { anio, respuestas, puntajeTotal } = body;
 
     // Validaciones básicas
-    if (!anio || !answers || !puntajeTotal) {
+    if (!anio || !respuestas || !puntajeTotal) {
       return NextResponse.json(
         { error: "Faltan campos requeridos: anio, respuestas, puntajeTotal" },
         { status: 400 }
@@ -70,7 +59,7 @@ export async function POST(request) {
       );
     }
 
-    if (!Array.isArray(answers) || answers.length !== 10) {
+    if (!Array.isArray(respuestas) || respuestas.length !== 10) {
       return NextResponse.json(
         { error: "Las respuestas deben ser un array de 10 elementos." },
         { status: 400 }
@@ -84,24 +73,23 @@ export async function POST(request) {
       );
     }
 
+    const collection = await getCollection();
+
     const newRespuesta = {
       anio,
-      respuestas: answers,
+      respuestas,
       puntajeTotal,
       timestamp: new Date().toISOString(),
     };
 
-    // TODO: Reemplazar con insert a la base de datos
-    // Ejemplo con MongoDB:
-    //   await collection.insertOne(newRespuesta);
-
-    respuestas.push(newRespuesta);
+    await collection.insertOne(newRespuesta);
 
     return NextResponse.json(
       { success: true, message: "Respuesta guardada correctamente" },
       { status: 201 }
     );
   } catch (error) {
+    console.error("Error al guardar respuesta:", error);
     return NextResponse.json(
       { error: "Error al procesar la solicitud" },
       { status: 500 }
