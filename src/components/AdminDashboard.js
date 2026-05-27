@@ -3,11 +3,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import DistribucionAnio from "./charts/DistribucionAnio";
-import PromedioAnio from "./charts/PromedioAnio";
 import EstadoBienestar from "./charts/EstadoBienestar";
 import QRCode from "react-qr-code";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 export default function AdminDashboard({ onLogout }) {
   const [data, setData] = useState([]);
@@ -17,7 +14,6 @@ export default function AdminDashboard({ onLogout }) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [showQR, setShowQR] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   const testUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   useEffect(() => {
@@ -52,30 +48,8 @@ export default function AdminDashboard({ onLogout }) {
     }
   };
 
-  const exportToPDF = async () => {
-    try {
-      setIsExporting(true);
-      const element = document.getElementById("pdf-export-content");
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        backgroundColor: "#0f0d1a",
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("Reporte_Bienestar_Digital.pdf");
-    } catch (err) {
-      console.error("Error al exportar PDF:", err);
-      alert("Hubo un error al generar el PDF.");
-    } finally {
-      setIsExporting(false);
-    }
+  const exportToPDF = () => {
+    window.print();
   };
 
   const filteredData =
@@ -149,24 +123,17 @@ export default function AdminDashboard({ onLogout }) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 no-print">
             <button
               onClick={exportToPDF}
-              disabled={isExporting || totalRespuestas === 0}
+              disabled={totalRespuestas === 0}
               id="btn-export-pdf"
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all disabled:opacity-50"
               title="Descargar PDF"
             >
-              {isExporting ? (
-                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              )}
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
             </button>
             <button
               onClick={() => setShowQR(true)}
@@ -202,7 +169,7 @@ export default function AdminDashboard({ onLogout }) {
         </div>
 
         {/* Filter */}
-        <div className="mb-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+        <div className="mb-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 no-print">
           <label className="text-xs font-semibold text-indigo-300/80 uppercase tracking-wider block mb-2">
             Filtrar por año
           </label>
@@ -269,7 +236,7 @@ export default function AdminDashboard({ onLogout }) {
         </div>
 
         {/* Reset button */}
-        <div className="mt-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+        <div className="mt-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 no-print">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-white">Reiniciar datos</p>
@@ -305,7 +272,7 @@ export default function AdminDashboard({ onLogout }) {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 pb-4">
+        <div className="text-center mt-8 pb-4 no-print">
           <p className="text-xs text-indigo-300/40">
             Escuela N° 4-012 &quot;Ing. Ricardo Videla&quot; · Test de Bienestar Digital
           </p>
