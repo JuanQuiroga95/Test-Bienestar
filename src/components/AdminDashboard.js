@@ -102,9 +102,10 @@ export default function AdminDashboard({ onLogout }) {
   }
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-6 animate-fadeIn">
-      {/* Header */}
-      <div className="max-w-4xl mx-auto">
+    <>
+      <div className="min-h-screen px-4 sm:px-6 py-6 animate-fadeIn">
+        {/* Header */}
+        <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10">
@@ -284,38 +285,40 @@ export default function AdminDashboard({ onLogout }) {
             ← Ir al test
           </a>
         </div>
-        {/* QR Code Modal */}
-        {showQR && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-[#1a172a] border border-white/10 rounded-2xl p-6 w-full max-w-sm text-center relative shadow-2xl">
-              <button
-                onClick={() => setShowQR(false)}
-                className="absolute top-4 right-4 text-white/50 hover:text-white"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <h3 className="text-xl font-bold text-white mb-2">Compartir Test</h3>
-              <p className="text-sm text-indigo-300/70 mb-6">
-                Los alumnos pueden escanear este código para entrar directamente.
-              </p>
-              <div className="bg-white p-4 rounded-xl inline-block mb-6">
-                <QRCode value={testUrl} size={200} />
-              </div>
-              <p className="text-xs font-mono bg-black/30 py-2 px-4 rounded-lg text-white/60 mb-2 truncate">
-                {testUrl}
-              </p>
-              <button
-                onClick={() => setShowQR(false)}
-                className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-colors"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
+    
+    {/* QR Code Modal (Outside animated container to fix stacking context) */}
+    {showQR && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+        <div className="bg-[#1a172a] border border-white/10 rounded-2xl p-6 w-full max-w-sm text-center relative shadow-2xl">
+          <button
+            onClick={() => setShowQR(false)}
+            className="absolute top-4 right-4 text-white/50 hover:text-white"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <h3 className="text-xl font-bold text-white mb-2">Compartir Test</h3>
+          <p className="text-sm text-indigo-300/70 mb-6">
+            Los alumnos pueden escanear este código para entrar directamente.
+          </p>
+          <div className="bg-white p-4 rounded-xl inline-block mb-6">
+            <QRCode value={testUrl} size={200} />
+          </div>
+          <p className="text-xs font-mono bg-black/30 py-2 px-4 rounded-lg text-white/60 mb-2 truncate">
+            {testUrl}
+          </p>
+          <button
+            onClick={() => setShowQR(false)}
+            className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-colors"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
