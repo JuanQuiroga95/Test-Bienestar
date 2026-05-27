@@ -5,6 +5,7 @@ import Image from "next/image";
 import DistribucionAnio from "./charts/DistribucionAnio";
 import PromedioAnio from "./charts/PromedioAnio";
 import EstadoBienestar from "./charts/EstadoBienestar";
+import QRCode from "react-qr-code";
 
 export default function AdminDashboard({ onLogout }) {
   const [data, setData] = useState([]);
@@ -13,6 +14,8 @@ export default function AdminDashboard({ onLogout }) {
   const [error, setError] = useState(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const testUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   useEffect(() => {
     fetchData();
@@ -118,6 +121,16 @@ export default function AdminDashboard({ onLogout }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowQR(true)}
+              id="btn-show-qr"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all"
+              title="Compartir código QR"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              </svg>
+            </button>
             <button
               onClick={fetchData}
               id="btn-refresh-data"
@@ -253,6 +266,37 @@ export default function AdminDashboard({ onLogout }) {
             ← Ir al test
           </a>
         </div>
+        {/* QR Code Modal */}
+        {showQR && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-[#1a172a] border border-white/10 rounded-2xl p-6 w-full max-w-sm text-center relative shadow-2xl">
+              <button
+                onClick={() => setShowQR(false)}
+                className="absolute top-4 right-4 text-white/50 hover:text-white"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-xl font-bold text-white mb-2">Compartir Test</h3>
+              <p className="text-sm text-indigo-300/70 mb-6">
+                Los alumnos pueden escanear este código para entrar directamente.
+              </p>
+              <div className="bg-white p-4 rounded-xl inline-block mb-6">
+                <QRCode value={testUrl} size={200} />
+              </div>
+              <p className="text-xs font-mono bg-black/30 py-2 px-4 rounded-lg text-white/60 mb-2 truncate">
+                {testUrl}
+              </p>
+              <button
+                onClick={() => setShowQR(false)}
+                className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
