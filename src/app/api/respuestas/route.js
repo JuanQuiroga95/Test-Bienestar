@@ -1,29 +1,29 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
-
-// Nombre de la base de datos y colección
-const DB_NAME = "test-bienestar";
-const COLLECTION_NAME = "respuestas";
-
-async function getCollection() {
-  const client = await clientPromise;
-  const db = client.db(DB_NAME);
-  return db.collection(COLLECTION_NAME);
-}
+import sql, { ensureTable } from "@/lib/db";
 
 // GET /api/respuestas - Obtener todas las respuestas
 export async function GET(request) {
   try {
-    const collection = await getCollection();
+    await ensureTable();
+
     const { searchParams } = new URL(request.url);
     const anio = searchParams.get("anio");
 
-    let filter = {};
+    let data;
     if (anio && anio !== "todos") {
-      filter = { anio };
+      data = await sql`
+        SELECT anio, respuestas, puntaje_total as "puntajeTotal", timestamp
+        FROM respuestas
+        WHERE anio = ${anio}
+        ORDER BY timestamp DESC
+      `;
+    } else {
+      data = await sql`
+        SELECT anio, respuestas, puntaje_total as "puntajeTotal", timestamp
+        FROM respuestas
+        ORDER BY timestamp DESC
+      `;
     }
-
-    const data = await collection.find(filter).sort({ timestamp: -1 }).toArray();
 
     return NextResponse.json({
       data,
@@ -73,16 +73,12 @@ export async function POST(request) {
       );
     }
 
-    const collection = await getCollection();
+    await ensureTable();
 
-    const newRespuesta = {
-      anio,
-      respuestas,
-      puntajeTotal,
-      timestamp: new Date().toISOString(),
-    };
-
-    await collection.insertOne(newRespuesta);
+    await sql`
+      INSERT INTO respuestas (anio, respuestas, puntaje_total)
+      VALUES (${anio}, ${respuestas}, ${puntajeTotal})
+    `;
 
     return NextResponse.json(
       { success: true, message: "Respuesta guardada correctamente" },

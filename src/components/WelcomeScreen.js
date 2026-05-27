@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export default function WelcomeScreen({ onStart }) {
   return (
@@ -93,8 +94,26 @@ export default function WelcomeScreen({ onStart }) {
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
       </button>
 
+      {/* Admin link */}
+      <Link
+        href="/admin"
+        id="btn-go-admin"
+        className="mt-4 w-full max-w-sm py-3 px-6 bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white/80 font-medium text-sm rounded-2xl transition-all duration-300 text-center backdrop-blur-md flex items-center justify-center gap-2"
+      >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Panel de Administración
+      </Link>
+
       {/* Footer quote */}
-      <p className="mt-8 text-xs text-indigo-400/50 text-center italic max-w-xs">
+      <p className="mt-6 text-xs text-indigo-400/50 text-center italic max-w-xs">
         &quot;No se trata de dejar el celular, sino de entender qué hace con nosotros.&quot;
       </p>
     </div>
