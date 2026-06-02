@@ -62,16 +62,15 @@ export default function AdminDashboard({ onLogout }) {
   const promedioGeneral =
     totalRespuestas > 0
       ? Math.round(
-          (filteredData.reduce((sum, d) => sum + d.puntajeTotal, 0) /
-            totalRespuestas) *
-            10
-        ) / 10
+          (filteredData.reduce((sum, d) => sum + (d.porcentaje || 0), 0) /
+            totalRespuestas)
+        )
       : 0;
 
   const getEstadoColor = (avg) => {
     if (avg === 0) return "text-white/40";
-    if (avg <= 16) return "text-emerald-400";
-    if (avg <= 23) return "text-amber-400";
+    if (avg <= 55) return "text-emerald-400";
+    if (avg <= 78) return "text-amber-400";
     return "text-rose-400";
   };
 
@@ -217,8 +216,7 @@ export default function AdminDashboard({ onLogout }) {
                 Promedio general
               </p>
               <p className={`text-3xl font-extrabold mt-1 ${getEstadoColor(promedioGeneral)}`}>
-                {promedioGeneral}
-                <span className="text-lg text-white/30"> / 30</span>
+                {promedioGeneral}%
               </p>
             </div>
           </div>
@@ -234,6 +232,41 @@ export default function AdminDashboard({ onLogout }) {
             <EstadoBienestar data={filteredData} />
             <DistribucionAnio data={filteredData} />
             <PromedioAnio data={filteredData} />
+          </div>
+
+          {/* Respuestas Abiertas */}
+          <div className="mt-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+            <h3 className="text-lg font-bold text-white mb-4">Respuestas Abiertas (Q14 y Q15)</h3>
+            {filteredData.some(d => d.respuestasTexto && Object.keys(d.respuestasTexto).length > 0) ? (
+              <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                {filteredData.map((d, i) => {
+                  if (!d.respuestasTexto || Object.keys(d.respuestasTexto).length === 0) return null;
+                  return (
+                    <div key={i} className="p-3 bg-white/5 rounded-xl border border-white/5">
+                      <p className="text-xs text-indigo-300 mb-2 font-medium">
+                        Año: {d.anio} | Puntaje: {Math.round(d.porcentaje || 0)}%
+                      </p>
+                      {d.respuestasTexto.q14 && (
+                        <div className="mb-2 bg-black/20 p-2 rounded-lg">
+                          <p className="text-xs font-semibold text-white/60 mb-1">¿En qué materias se usa el celular?</p>
+                          <p className="text-sm text-white/90">{d.respuestasTexto.q14}</p>
+                        </div>
+                      )}
+                      {d.respuestasTexto.q15 && (
+                        <div className="bg-black/20 p-2 rounded-lg">
+                          <p className="text-xs font-semibold text-white/60 mb-1">¿Qué tareas te piden los docentes?</p>
+                          <p className="text-sm text-white/90">{d.respuestasTexto.q15}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-white/50 text-center py-4 bg-white/5 rounded-xl border border-white/5">
+                No hay respuestas abiertas registradas para los filtros seleccionados.
+              </p>
+            )}
           </div>
         </div>
 

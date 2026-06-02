@@ -25,23 +25,34 @@ export default function Home() {
   }, []);
 
   const handleAnswer = useCallback(
-    (optionIndex) => {
+    (answerValue) => {
       const newAnswers = [...answers];
-      newAnswers[currentQuestion] = optionIndex;
+      newAnswers[currentQuestion] = answerValue;
       setAnswers(newAnswers);
 
       const question = questions[currentQuestion];
 
       // Store the year if it's the first question
       if (question.type === "curso") {
-        setAnio(question.options[optionIndex].value);
+        setAnio(question.options[answerValue].value);
       }
     },
     [answers, currentQuestion]
   );
 
   const handleNext = useCallback(() => {
-    if (answers[currentQuestion] === null) return;
+    const currentAns = answers[currentQuestion];
+    if (currentAns === null || (typeof currentAns === "string" && currentAns.trim() === "")) return;
+
+    // Check branching logic for Q3 (index 2)
+    // If answer to Q3 is index 2 ("No, nunca lo traigo"), skip part 3
+    const isQ3OptionC = answers[2] === 2;
+    const isEndOfPart2 = currentQuestion === 11; // Question 12 (0-indexed 11)
+    
+    if (isEndOfPart2 && isQ3OptionC) {
+      handleSubmit();
+      return;
+    }
 
     if (currentQuestion < questions.length - 1) {
       // Animate transition
@@ -67,21 +78,32 @@ export default function Home() {
   }, [currentQuestion]);
 
   const handleSubmit = async () => {
-    // Calculate total score from questions 2-11 (index 1-10)
+    // Calculate total score from puntuable questions
     let totalScore = 0;
+    let maxPossibleScore = 0;
     const scoredAnswers = [];
+    const textAnswers = {};
+    const contextAnswers = {};
 
-    for (let i = 1; i < questions.length; i++) {
+    for (let i = 0; i < questions.length; i++) {
       const question = questions[i];
-      const answerIndex = answers[i];
-      if (answerIndex !== null) {
-        const pointValue = question.options[answerIndex].value;
+      const answer = answers[i];
+      if (answer === null || answer === undefined) continue;
+
+      if (question.type === "puntuable") {
+        const pointValue = question.options[answer].value;
         totalScore += pointValue;
+        maxPossibleScore += 3; // Max value per puntuable question is 3
         scoredAnswers.push(pointValue);
+      } else if (question.type === "texto") {
+        textAnswers[`q${question.id}`] = answer;
+      } else if (question.type === "contexto") {
+        contextAnswers[`q${question.id}`] = question.options[answer].value;
       }
     }
 
-    setScore(totalScore);
+    const scorePercent = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+    setScore(scorePercent);
     setScreen("submitting");
 
     // POST to API asynchronously
@@ -92,7 +114,10 @@ export default function Home() {
         body: JSON.stringify({
           anio: anio,
           respuestas: scoredAnswers,
+          contexto: contextAnswers,
+          respuestasTexto: textAnswers,
           puntajeTotal: totalScore,
+          porcentaje: scorePercent
         }),
       });
     } catch (error) {
@@ -137,8 +162,10 @@ export default function Home() {
 
   // Test screen
   const question = questions[currentQuestion];
-  const isLastQuestion = currentQuestion === questions.length - 1;
-  const hasAnswered = answers[currentQuestion] !== null;
+  const isQ3OptionC = answers[2] === 2;
+  const isLastQuestion = currentQuestion === questions.length - 1 || (currentQuestion === 11 && isQ3OptionC);
+  const currentAns = answers[currentQuestion];
+  const hasAnswered = currentAns !== null && currentAns !== undefined && (typeof currentAns !== "string" || currentAns.trim() !== "");
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-8">

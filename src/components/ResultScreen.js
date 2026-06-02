@@ -19,9 +19,9 @@ export default function ResultScreen({ score, onRestart }) {
           <span className="text-sm text-indigo-300/80">Tu puntaje</span>
           <br />
           <span className="text-4xl font-extrabold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-            {score}
+            {Math.round(score)}%
           </span>
-          <span className="text-lg text-indigo-300/60"> / 30</span>
+          <span className="text-lg text-indigo-300/60"></span>
         </p>
       </div>
 
@@ -60,9 +60,9 @@ export default function ResultScreen({ score, onRestart }) {
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-emerald-400" />
             <span className="text-sm text-white/60">
-              10-16: Uso saludable
+              0-55%: Uso saludable
             </span>
-            {score >= 10 && score <= 16 && (
+            {score >= 0 && score <= 55 && (
               <span className="ml-auto text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">
                 ← Estás acá
               </span>
@@ -71,9 +71,9 @@ export default function ResultScreen({ score, onRestart }) {
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-amber-400" />
             <span className="text-sm text-white/60">
-              17-23: Uso a revisar
+              56-78%: Uso a revisar
             </span>
-            {score >= 17 && score <= 23 && (
+            {score >= 56 && score <= 78 && (
               <span className="ml-auto text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">
                 ← Estás acá
               </span>
@@ -82,9 +82,9 @@ export default function ResultScreen({ score, onRestart }) {
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-rose-400" />
             <span className="text-sm text-white/60">
-              24-30: Puede afectar tu bienestar
+              79-100%: Puede afectar tu bienestar
             </span>
-            {score >= 24 && score <= 30 && (
+            {score >= 79 && score <= 100 && (
               <span className="ml-auto text-xs bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded-full">
                 ← Estás acá
               </span>

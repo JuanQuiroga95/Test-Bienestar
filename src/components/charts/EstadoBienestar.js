@@ -10,9 +10,9 @@ import {
 } from "recharts";
 
 const ESTADOS = [
-  { name: "Uso saludable", color: "#34d399", range: [10, 16] },
-  { name: "Uso a revisar", color: "#fbbf24", range: [17, 23] },
-  { name: "Afecta bienestar", color: "#f87171", range: [24, 30] },
+  { name: "Uso saludable", color: "#34d399", range: [0, 55] },
+  { name: "Uso a revisar", color: "#fbbf24", range: [56, 78] },
+  { name: "Afecta bienestar", color: "#f87171", range: [79, 100] },
 ];
 
 const CustomTooltip = ({ active, payload }) => {
@@ -78,7 +78,7 @@ export default function EstadoBienestar({ data }) {
   const chartData = ESTADOS.map((estado) => {
     const count = data.filter(
       (d) =>
-        d.puntajeTotal >= estado.range[0] && d.puntajeTotal <= estado.range[1]
+        (d.porcentaje || 0) >= estado.range[0] && (d.porcentaje || 0) <= estado.range[1]
     ).length;
     return {
       name: estado.name,

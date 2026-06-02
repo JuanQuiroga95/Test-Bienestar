@@ -4,10 +4,11 @@
 // ============================================================
 
 export const questions = [
+  // PARTE 1
   {
     id: 1,
     text: "¿En qué año estás?",
-    subtitle: "(No suma puntaje, es solo para identificar tu curso)",
+    subtitle: "Parte 1: Contexto (No suma puntaje)",
     type: "curso",
     options: [
       { label: "A", text: "1° año", value: "1" },
@@ -19,7 +20,31 @@ export const questions = [
   },
   {
     id: 2,
+    text: "¿Tenés celular?",
+    subtitle: "Parte 1: Contexto",
+    type: "contexto",
+    options: [
+      { label: "A", text: "Sí, tengo celular propio", value: "propio" },
+      { label: "B", text: "Sí, pero es de la familia (compartido)", value: "familiar" },
+      { label: "C", text: "No tengo celular", value: "no" },
+    ],
+  },
+  {
+    id: 3,
+    text: "¿Traes celular a la escuela?",
+    subtitle: "Parte 1: Contexto",
+    type: "contexto",
+    options: [
+      { label: "A", text: "Sí, lo traigo siempre", value: "siempre" },
+      { label: "B", text: "A veces lo traigo", value: "a_veces" },
+      { label: "C", text: "No, nunca lo traigo", value: "nunca" },
+    ],
+  },
+  // PARTE 2: BIENESTAR DIGITAL
+  {
+    id: 4,
     text: "¿Cuántas horas usás el celular por día (fuera del horario escolar)?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "Menos de 2 horas", value: 1 },
@@ -28,8 +53,9 @@ export const questions = [
     ],
   },
   {
-    id: 3,
+    id: 5,
     text: "¿Usás el celular antes de dormir?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "No, lo dejo apagado o lejos", value: 1 },
@@ -38,8 +64,9 @@ export const questions = [
     ],
   },
   {
-    id: 4,
+    id: 6,
     text: "¿Qué hacés más con el celular?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "Buscar información, estudiar o crear contenido", value: 1 },
@@ -48,18 +75,9 @@ export const questions = [
     ],
   },
   {
-    id: 5,
-    text: "Cuando el docente no lo pide, ¿usás el celular durante la clase?",
-    type: "puntuable",
-    options: [
-      { label: "A", text: "No, lo guardo", value: 1 },
-      { label: "B", text: "A veces lo miro de reojo", value: 2 },
-      { label: "C", text: "Sí, casi siempre lo tengo en uso", value: 3 },
-    ],
-  },
-  {
-    id: 6,
+    id: 7,
     text: "¿Alguna vez el celular te ayudó a entender algo en clase o a hacer una tarea?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "Sí, lo uso seguido con ese fin", value: 1 },
@@ -68,8 +86,9 @@ export const questions = [
     ],
   },
   {
-    id: 7,
+    id: 8,
     text: "¿Sabés evaluar si una información que encontrás en internet es confiable?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "Sí, contrasto fuentes antes de quedarme con algo", value: 1 },
@@ -78,8 +97,9 @@ export const questions = [
     ],
   },
   {
-    id: 8,
-    text: "¿Alguna vez algo publicado en redes sociales generó un problema real con alguien (compañero/a, docente, familia)?",
+    id: 9,
+    text: "¿Alguna vez algo publicado en redes sociales generó un problema real?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "No, nunca", value: 1 },
@@ -88,8 +108,9 @@ export const questions = [
     ],
   },
   {
-    id: 9,
+    id: 10,
     text: "¿Sentís que lo que mostrás en redes es igual a como sos en la vida real?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "Sí, muestro lo que soy", value: 1 },
@@ -98,8 +119,9 @@ export const questions = [
     ],
   },
   {
-    id: 10,
+    id: 11,
     text: "¿Alguna vez te preguntaste por qué el celular te muestra siempre el mismo tipo de contenido?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "Sí, entiendo que hay algoritmos que deciden lo que veo", value: 1 },
@@ -108,8 +130,9 @@ export const questions = [
     ],
   },
   {
-    id: 11,
+    id: 12,
     text: "¿Podés dejar el celular de lado cuando querés concentrarte en algo importante?",
+    subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
       { label: "A", text: "Sí, no me cuesta", value: 1 },
@@ -117,12 +140,38 @@ export const questions = [
       { label: "C", text: "No, me genera ansiedad no tenerlo cerca", value: 3 },
     ],
   },
+  // PARTE 3: USO PEDAGOGICO EN LA ESCUELA
+  {
+    id: 13,
+    text: "Cuando el docente no lo pide, ¿usás el celular durante la clase?",
+    subtitle: "Parte 3: Uso Pedagógico",
+    type: "puntuable",
+    options: [
+      { label: "A", text: "No, lo guardo", value: 1 },
+      { label: "B", text: "A veces lo miro de reojo", value: 2 },
+      { label: "C", text: "Sí, casi siempre lo tengo en uso", value: 3 },
+    ],
+  },
+  {
+    id: 14,
+    text: "¿En qué materias se usa el celular?",
+    subtitle: "Parte 3: Uso Pedagógico",
+    type: "texto",
+    placeholder: "Escribe tu respuesta aquí...",
+  },
+  {
+    id: 15,
+    text: "¿Qué tareas te piden los docentes que realices con el celular en la clase? (Ej: ver videos, buscar información, usar app, etc.)",
+    subtitle: "Parte 3: Uso Pedagógico",
+    type: "texto",
+    placeholder: "Escribe tu respuesta aquí...",
+  }
 ];
 
 export const resultRanges = [
   {
-    min: 10,
-    max: 16,
+    minPercent: 0,
+    maxPercent: 55,
     title: "Uso saludable",
     emoji: "🌿",
     description:
@@ -134,8 +183,8 @@ export const resultRanges = [
     textClass: "text-emerald-700",
   },
   {
-    min: 17,
-    max: 23,
+    minPercent: 56,
+    maxPercent: 78,
     title: "Uso a revisar",
     emoji: "🔍",
     description:
@@ -147,8 +196,8 @@ export const resultRanges = [
     textClass: "text-amber-700",
   },
   {
-    min: 24,
-    max: 30,
+    minPercent: 79,
+    maxPercent: 100,
     title: "Uso que puede afectar tu bienestar",
     emoji: "⚠️",
     description:
@@ -164,6 +213,6 @@ export const resultRanges = [
 export const FINAL_QUOTE =
   "\"No se trata de dejar el celular, sino de entender qué hace con nosotros.\"";
 
-export function getResultForScore(score) {
-  return resultRanges.find((r) => score >= r.min && score <= r.max);
+export function getResultForScore(scorePercent) {
+  return resultRanges.find((r) => scorePercent >= r.minPercent && scorePercent <= r.maxPercent);
 }
