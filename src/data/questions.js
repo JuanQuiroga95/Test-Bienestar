@@ -65,7 +65,7 @@ export const questions = [
   },
   {
     id: 6,
-    text: "¿Qué hacés más con el celular?",
+    text: "¿Qué más hacés con el celular?",
     subtitle: "Parte 2: Bienestar Digital",
     type: "puntuable",
     options: [
