@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { questions } from "../data/questions";
 
 export default function WelcomeScreen({ onStart }) {
   return (
@@ -56,7 +57,7 @@ export default function WelcomeScreen({ onStart }) {
         <div className="flex items-start gap-3 mb-3">
           <span className="text-2xl">📱</span>
           <div>
-            <p className="text-white font-semibold text-sm">11 preguntas</p>
+            <p className="text-white font-semibold text-sm">{questions.length} preguntas</p>
             <p className="text-indigo-300/70 text-xs mt-0.5">
               Marcá la opción que mejor describe lo que te pasa a vos.
             </p>
