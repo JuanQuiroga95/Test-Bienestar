@@ -5,6 +5,7 @@ import Image from "next/image";
 import DistribucionAnio from "./charts/DistribucionAnio";
 import PromedioAnio from "./charts/PromedioAnio";
 import EstadoBienestar from "./charts/EstadoBienestar";
+import AnalisisPorPregunta from "./charts/AnalisisPorPregunta";
 import QRCode from "react-qr-code";
 
 export default function AdminDashboard({ onLogout }) {
@@ -232,6 +233,7 @@ export default function AdminDashboard({ onLogout }) {
             <EstadoBienestar data={filteredData} />
             <DistribucionAnio data={filteredData} />
             <PromedioAnio data={filteredData} />
+            <AnalisisPorPregunta data={filteredData} />
           </div>
 
           {/* Respuestas Abiertas */}

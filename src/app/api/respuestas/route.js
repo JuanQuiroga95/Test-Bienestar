@@ -12,14 +12,18 @@ export async function GET(request) {
     let data;
     if (anio && anio !== "todos") {
       data = await sql`
-        SELECT anio, respuestas, puntaje_total as "puntajeTotal", timestamp
+        SELECT anio, respuestas, puntaje_total as "puntajeTotal", 
+               COALESCE(porcentaje, (puntaje_total::numeric / (array_length(respuestas, 1) * 3) * 100)) as "porcentaje",
+               respuestas_texto as "respuestasTexto", contexto, timestamp
         FROM respuestas
         WHERE anio = ${anio}
         ORDER BY timestamp DESC
       `;
     } else {
       data = await sql`
-        SELECT anio, respuestas, puntaje_total as "puntajeTotal", timestamp
+        SELECT anio, respuestas, puntaje_total as "puntajeTotal", 
+               COALESCE(porcentaje, (puntaje_total::numeric / (array_length(respuestas, 1) * 3) * 100)) as "porcentaje",
+               respuestas_texto as "respuestasTexto", contexto, timestamp
         FROM respuestas
         ORDER BY timestamp DESC
       `;
@@ -42,7 +46,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { anio, respuestas, puntajeTotal } = body;
+    const { anio, respuestas, puntajeTotal, porcentaje, respuestasTexto, contexto } = body;
 
     // Validaciones básicas
     if (!anio || !respuestas || !puntajeTotal) {
@@ -59,16 +63,16 @@ export async function POST(request) {
       );
     }
 
-    if (!Array.isArray(respuestas) || respuestas.length !== 10) {
+    if (!Array.isArray(respuestas) || respuestas.length < 9 || respuestas.length > 10) {
       return NextResponse.json(
-        { error: "Las respuestas deben ser un array de 10 elementos." },
+        { error: "Las respuestas deben ser un array de 9 o 10 elementos." },
         { status: 400 }
       );
     }
 
-    if (puntajeTotal < 10 || puntajeTotal > 30) {
+    if (puntajeTotal < 9 || puntajeTotal > 30) {
       return NextResponse.json(
-        { error: "El puntaje total debe estar entre 10 y 30." },
+        { error: "El puntaje total debe estar entre 9 y 30." },
         { status: 400 }
       );
     }
@@ -76,8 +80,8 @@ export async function POST(request) {
     await ensureTable();
 
     await sql`
-      INSERT INTO respuestas (anio, respuestas, puntaje_total)
-      VALUES (${anio}, ${respuestas}, ${puntajeTotal})
+      INSERT INTO respuestas (anio, respuestas, puntaje_total, porcentaje, respuestas_texto, contexto)
+      VALUES (${anio}, ${respuestas}, ${puntajeTotal}, ${porcentaje || null}, ${respuestasTexto ? JSON.stringify(respuestasTexto) : null}, ${contexto ? JSON.stringify(contexto) : null})
     `;
 
     return NextResponse.json(

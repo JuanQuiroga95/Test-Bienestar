@@ -19,6 +19,14 @@ export async function ensureTable() {
       timestamp TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+
+  try {
+    await sql`ALTER TABLE respuestas ADD COLUMN IF NOT EXISTS porcentaje NUMERIC`;
+    await sql`ALTER TABLE respuestas ADD COLUMN IF NOT EXISTS respuestas_texto JSONB`;
+    await sql`ALTER TABLE respuestas ADD COLUMN IF NOT EXISTS contexto JSONB`;
+  } catch (error) {
+    console.error("Error al actualizar la tabla de respuestas:", error);
+  }
 }
 
 export default sql;
