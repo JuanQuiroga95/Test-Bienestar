@@ -63,7 +63,7 @@ export default function AdminDashboard({ onLogout }) {
   const promedioGeneral =
     totalRespuestas > 0
       ? Math.round(
-          (filteredData.reduce((sum, d) => sum + (d.porcentaje || 0), 0) /
+          (filteredData.reduce((sum, d) => sum + Number(d.porcentaje || 0), 0) /
             totalRespuestas)
         )
       : 0;

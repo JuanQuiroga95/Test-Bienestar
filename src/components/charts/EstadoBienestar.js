@@ -78,7 +78,7 @@ export default function EstadoBienestar({ data }) {
   const chartData = ESTADOS.map((estado) => {
     const count = data.filter(
       (d) =>
-        (d.porcentaje || 0) >= estado.range[0] && (d.porcentaje || 0) <= estado.range[1]
+        Number(d.porcentaje || 0) >= estado.range[0] && Number(d.porcentaje || 0) <= estado.range[1]
     ).length;
     return {
       name: estado.name,
