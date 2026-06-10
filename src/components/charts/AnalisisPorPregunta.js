@@ -43,31 +43,50 @@ const CustomLegend = ({ payload }) => {
 };
 
 export default function AnalisisPorPregunta({ data }) {
-  const puntuableQuestions = questions.filter(q => q.type === "puntuable");
+  // Solo analizamos preguntas puntuables y las preguntas 2 y 3 (contexto)
+  const analyzableQuestions = questions.filter(
+    (q) => q.type === "puntuable" || q.id === 2 || q.id === 3
+  );
   const [selectedQIdx, setSelectedQIdx] = useState(0);
 
-  const question = puntuableQuestions[selectedQIdx];
+  const question = analyzableQuestions[selectedQIdx];
   
-  const counts = { 1: 0, 2: 0, 3: 0 };
+  const counts = [0, 0, 0];
   let totalAnswered = 0;
 
-  data.forEach(d => {
-    if (d.respuestas && d.respuestas[selectedQIdx] !== undefined) {
-      const val = d.respuestas[selectedQIdx];
-      if (counts[val] !== undefined) {
-        counts[val]++;
-        totalAnswered++;
+  data.forEach((d) => {
+    if (question.type === "puntuable") {
+      // En la base de datos, 'respuestas' es un array que guarda las preguntas 4 a 13.
+      // El índice 0 corresponde a la Q4, el 1 a la Q5, etc.
+      const respIdx = question.id - 4;
+      if (d.respuestas && d.respuestas[respIdx] !== undefined) {
+        const val = d.respuestas[respIdx]; // Devuelve 1, 2 o 3
+        if (val >= 1 && val <= 3) {
+          counts[val - 1]++;
+          totalAnswered++;
+        }
+      }
+    } else if (question.type === "contexto") {
+      // Las respuestas de contexto se guardan en el objeto 'contexto'
+      if (d.contexto && d.contexto[`q${question.id}`]) {
+        const val = d.contexto[`q${question.id}`];
+        // Buscamos qué opción corresponde a este valor
+        const optIdx = question.options.findIndex((o) => o.value === val);
+        if (optIdx !== -1) {
+          counts[optIdx]++;
+          totalAnswered++;
+        }
       }
     }
   });
 
   const chartData = [
-    { name: "Opción A", fullName: question.options[0].text, value: counts[1], color: COLORS[0] },
-    { name: "Opción B", fullName: question.options[1].text, value: counts[2], color: COLORS[1] },
-    { name: "Opción C", fullName: question.options[2].text, value: counts[3], color: COLORS[2] },
-  ].map(item => ({
+    { name: "Opción A", fullName: question.options[0].text, value: counts[0], color: COLORS[0] },
+    { name: "Opción B", fullName: question.options[1].text, value: counts[1], color: COLORS[1] },
+    { name: "Opción C", fullName: question.options[2].text, value: counts[2], color: COLORS[2] },
+  ].map((item) => ({
     ...item,
-    percentage: totalAnswered > 0 ? Math.round((item.value / totalAnswered) * 100) : 0
+    percentage: totalAnswered > 0 ? Math.round((item.value / totalAnswered) * 100) : 0,
   }));
 
   return (
@@ -87,9 +106,9 @@ export default function AnalisisPorPregunta({ data }) {
           onChange={(e) => setSelectedQIdx(Number(e.target.value))}
           className="bg-[#1a172a] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500 max-w-xs sm:max-w-[200px]"
         >
-          {puntuableQuestions.map((q, idx) => (
+          {analyzableQuestions.map((q, idx) => (
             <option key={q.id} value={idx}>
-              Pregunta {idx + 1}
+              Pregunta {q.id}
             </option>
           ))}
         </select>
@@ -102,7 +121,10 @@ export default function AnalisisPorPregunta({ data }) {
 
       {totalAnswered === 0 ? (
         <div className="h-64 flex items-center justify-center">
-          <p className="text-white/40 text-sm">No hay respuestas para esta pregunta</p>
+          <p className="text-white/40 text-sm text-center px-4">
+            Aún no hay datos guardados para esta pregunta.<br/>
+            (Los test nuevos comenzarán a registrar esta información).
+          </p>
         </div>
       ) : (
         <div className="flex flex-col md:flex-row items-center justify-center gap-6">
